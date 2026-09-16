@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOXEL GRAND PRIX</title>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<div id="app"></div>
+
+<div id="auth" class="auth-overlay">
+  <div class="auth-panel">
+    <div class="menu-kicker">VOXEL RACING SERIES</div>
+    <h2>PADDOCK ACCESS</h2>
+    <p>Create a local driver profile to save wins and unlock circuits and cars.</p>
+    <form id="auth-form">
+      <input id="auth-username" autocomplete="username" placeholder="Username" required>
+      <input id="auth-password" type="password" autocomplete="current-password" placeholder="Password" required>
+      <button id="auth-submit" type="submit">Create Profile</button>
+    </form>
+    <button id="auth-switch" class="auth-switch" type="button">Already registered? Sign in</button>
+    <div id="auth-error" class="auth-error"></div>
+    <small>Offline profile: credentials stay in this browser.</small>
+  </div>
+</div>
+
+<!-- ===================== MENU ===================== -->
+<div id="menu">
+  <div class="menu-inner">
+    <div class="menu-rail"><span>VOXEL RACING SERIES</span><b>2022 SEASON</b><span>CAREER HUB / LIVE TIMING</span></div>
+    <div class="title-block">
+      <div class="menu-kicker">WELCOME TO THE PADDOCK</div>
+      <h1 class="title">VOXEL <span>GRAND PRIX</span></h1>
+      <div class="subtitle">Voxel Grand Prix · Six legendary F1 circuits rebuilt from real geometry data · Race weekend</div>
+    </div>
+    <div class="profile-bar"><span id="profile-name"></span><b id="profile-progress"></b><button id="btn-logout" type="button">Sign Out</button></div>
+    <div class="menu-section-heading"><span>SELECT EVENT</span><i></i><b>06 CIRCUITS</b></div>
+    <div id="track-cards"></div>
+    <div class="menu-row menu-loadout">
+      <div class="menu-label">Car</div>
+      <div id="selected-team"></div>
+      <button id="btn-garage">🏎 Enter Garage · GARAGE</button>
+    </div>
+    <div class="menu-row">
+      <div class="menu-label">Mode</div>
+      <button class="mode-chip" data-mode="time">⏱ Time Trial · Free Practice</button>
+      <button class="mode-chip" data-mode="race">🏁 Race · 10 Teams · 3 Laps</button>
+    </div>
+    <div class="menu-row settings-row">
+      <label class="menu-label" for="steering-sensitivity">Steering</label>
+      <input id="steering-sensitivity" type="range" min="35" max="100" step="5" value="75">
+      <output id="steering-sensitivity-value">75%</output>
+    </div>
+    <div class="multiplayer-panel">
+      <b>FRIEND SESSION</b><span id="online-status">Offline</span>
+      <button id="online-create" type="button">Create Code</button>
+      <input id="online-code" maxlength="6" placeholder="JOIN CODE">
+      <button id="online-join" type="button">Join</button>
+      <strong id="online-room"></strong>
+    </div>
+    <div class="menu-race-note"><span class="live-dot"></span><b>RACE CONTROL</b> Pit lane active · follow the red P marker · service below 65 km/h</div>
+    <div class="controls-help">
+      <span><b>W / ↑</b> Throttle</span><span><b>S / ↓</b> Brake</span><span><b>A D / ← →</b> Steer</span>
+      <span><b>C</b> Camera</span><span><b>R</b> Reset Track</span><span><b>P</b> Demo Mode</span>
+      <span><b>M</b> Mute</span><span><b>Esc</b> Pause</span><span>🎮 Gamepad</span>
+    </div>
+    <button id="btn-start">Enter Track · LIGHTS OUT</button>
+  </div>
+</div>
+
+<!-- ===================== HUD ===================== -->
+<div id="hud" class="hidden">
+  <div id="hud-topleft">
+    <div id="hud-track-name"></div>
+    <div id="hud-corner"></div>
+  </div>
+
+  <div id="hud-times">
+    <div class="lap-chip">LAP <span id="hud-lap">1</span></div>
+    <div id="hud-time">0:00.000</div>
+    <div class="hud-times-row">
+      <span>Last lap <b id="hud-last">--:--.---</b></span>
+      <span class="best-col">Best lap <b id="hud-best">--:--.---</b></span>
+    </div>
+  </div>
+
+  <div id="hud-autopilot" class="hidden">🤖 Demo Mode</div>
+  <div id="hud-pit" class="hud-pit">PIT LANE <b>READY</b></div>
+
+  <div id="hud-dash">
+    <div id="hud-drs" class="drs-off">DRS</div>
+    <div id="hud-pos" class="hidden">P8<i>/8</i></div>
+    <div class="dash-main">
+      <div id="hud-gear">1</div>
+      <div class="dash-speed">
+        <div id="hud-speed">0</div>
+        <div class="unit">km/h</div>
+      </div>
+    </div>
+    <div id="hud-rpm"><div id="hud-rpm-fill"></div></div>
+    <div class="hud-dash-foot"><span id="hud-tyres">ROAD</span><span id="hud-pit-count">PIT 0</span></div>
+    <div id="hud-gaps" class="hidden"></div>
+  </div>
+
+  <canvas id="minimap" width="230" height="230"></canvas>
+  <div id="hud-camera-label"></div>
+  <div id="hud-cam-hint">C Camera · R Reset · Esc Pause</div>
+</div>
+
+<!-- ===================== overlays ===================== -->
+<div id="lights" class="hidden">
+  <div class="lights-bar">
+    <div class="light-col"><i></i><i></i></div>
+    <div class="light-col"><i></i><i></i></div>
+    <div class="light-col"><i></i><i></i></div>
+    <div class="light-col"><i></i><i></i></div>
+    <div class="light-col"><i></i><i></i></div>
+  </div>
+</div>
+
+<div id="center-msg" class="hidden"></div>
+<div id="wrongway" class="hidden">⚠ Wrong Way</div>
+
+<div id="pause" class="hidden">
+  <div class="pause-box">
+    <h2>Paused</h2>
+    <button id="btn-resume">Resume Race</button>
+    <button id="btn-restart">Restart</button>
+    <button id="btn-menu">Back to Track Select</button>
+  </div>
+</div>
+
+<div id="results" class="hidden">
+  <div class="results-box">
+    <div class="results-flag">🏁</div>
+    <h2>Race Finished</h2>
+    <div id="results-pos">P1</div>
+    <div id="results-rows"></div>
+    <div class="results-actions">
+      <button id="btn-res-again">Race Again</button>
+      <button id="btn-res-menu">Back to Menu</button>
+    </div>
+  </div>
+</div>
+
+<div id="loading" class="hidden"><div class="spinner"></div><span id="loading-msg">Laying Track…</span></div>
+
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
